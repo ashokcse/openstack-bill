@@ -1,9 +1,6 @@
 openstack-bill
 ==============
 
-Introduction 
-=============
--------------------------------------------------------------------------------------------------------------------------
 This is a modified OpenStack (Diablo release) which includes new modules enabling the Billing services (accountability)  
 
 New modules are added to the Diablo release of keystone and horizon (openstack dashboard) to enable these services.
