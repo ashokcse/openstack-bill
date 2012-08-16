@@ -3,7 +3,7 @@ openstack-bill
 
 Introduction 
 =============
-----------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
 This is a modified OpenStack (Diablo release) which includes new modules enabling the Billing services (accountability)  
 
 New modules are added to the Diablo release of keystone and horizon (openstack dashboard) to enable these services.
@@ -23,7 +23,7 @@ Screen Capture (Screenshots) of the Horizon (openStack Dashboard) are in "Horizo
 
 Billing details can also be downloaded as ".CSV" file from Dashboard as usual. 
 
------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
 
 How to Install:
 ===============
@@ -61,4 +61,21 @@ Horizon Screenshots
 
 Screenshot 1: System Panel : Billing 
 
-https://lh6.googleusercontent.com/-IXz8xYtyVP4/UC1OG1hxk9I/AAAAAAAAAC0/Z449l04KgsA/s0/System_panel_Bills_overview.jpg
+        http://tinyurl.com/cajbhu6
+
+Screenshot 2: System Panel Overview
+
+        http://tinyurl.com/cbovbks
+        
+Screenshot 3: System Panel : Tenant Bill
+
+        http://tinyurl.com/bu3ckn6
+        
+Screenshot 4: User Dashboard : MyBill
+        
+        http://tinyurl.com/cagsfqu
+
+Screenshot 5: System Panel : Unit Bill creation 
+
+        http://tinyurl.com/d4267ub
+        
