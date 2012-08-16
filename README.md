@@ -61,4 +61,4 @@ Horizon Screenshots
 
 Screenshot 1: System Panel : Billing
 
-https://lh6.googleusercontent.com/-IXz8xYtyVP4/UC1OG1hxk9I/AAAAAAAAAC0/Z449l04KgsA/s800/System_panel_Bills_overview.jpg
+https://lh6.googleusercontent.com/-IXz8xYtyVP4/UC1OG1hxk9I/AAAAAAAAAC0/Z449l04KgsA/s0/System_panel_Bills_overview.jpg
