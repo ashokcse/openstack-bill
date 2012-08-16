@@ -38,7 +38,7 @@ Step 1: Update apt-get
         
 Step 2: Download these files or git clone 
 
-       git clone https://github.com/ashokcse/openstack-bill.git
+       git clone git://github.com/ashokcse/openstack-bill.git
        
 Step 3: Running initial setup
 
@@ -48,7 +48,7 @@ Step 4: Go to devstach directory (~/devstack)
 
         cd ~/devstack
         
-Step 5: Run stack.sh file (similar to devstack installation process)
+Step 5: Start the installation (similar to devstack installation process)
 
         ./stack.sh
         
