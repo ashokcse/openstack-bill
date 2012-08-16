@@ -53,3 +53,12 @@ Step 5: Start the installation (similar to devstack installation process)
         ./stack.sh
         
 The remaining steps are same as  normal devstack installation of OpenStack.
+
+------------------------------------------------------------------------------------------------------------------------
+
+Horizon Screenshots
+===================
+
+Screenshot 1: System Panel : Billing
+
+https://lh6.googleusercontent.com/-IXz8xYtyVP4/UC1OG1hxk9I/AAAAAAAAAC0/Z449l04KgsA/s800/System_panel_Bills_overview.jpg
