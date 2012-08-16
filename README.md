@@ -61,21 +61,21 @@ Horizon Screenshots
 
 Screenshot 1: System Panel : Billing 
 
-        http://tinyurl.com/cajbhu6
+   http://tinyurl.com/cajbhu6
 
 Screenshot 2: System Panel Overview
 
-        http://tinyurl.com/cbovbks
+   http://tinyurl.com/cbovbks
         
 Screenshot 3: System Panel : Tenant Bill
 
-        http://tinyurl.com/bu3ckn6
+   http://tinyurl.com/bu3ckn6
         
 Screenshot 4: User Dashboard : MyBill
-        
-        http://tinyurl.com/cagsfqu
+      
+   http://tinyurl.com/cagsfqu
 
 Screenshot 5: System Panel : Unit Bill creation 
 
-        http://tinyurl.com/d4267ub
+   http://tinyurl.com/d4267ub
         
