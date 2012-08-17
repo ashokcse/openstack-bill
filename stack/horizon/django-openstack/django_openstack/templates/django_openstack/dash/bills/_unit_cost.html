@@ -1,0 +1,15 @@
+  <table class="wide">
+      <tr id="headings">
+        <th>VCPU CPU-Hours</th>
+        <th>RAM MB-Hours</th>
+        <th>Disk GB-Hours</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+      </tr>
+      <tr>
+        <td>$ {{unit_cost.vcpu|floatformat:3}}</td>
+        <td>$ {{unit_cost.ram|floatformat:3}}</td>
+        <td>$ {{unit_cost.vdisk|floatformat:3}}</td>
+        <td> {{unit_cost.start_date}}</td>
+        <td> {{unit_cost.end_date}}</td>
+      </tr>

@@ -1,0 +1,3 @@
+setuptools
+mox>=0.5.3
+django_nose

@@ -1,0 +1,45 @@
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] **************************************************
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] Configuration options gathered from config file:
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] /opt/stack/keystone/etc/keystone.conf
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] ================================================
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] admin_host           0.0.0.0
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] admin_port           35357
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] backends             keystone.backends.sqlalchemy
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] debug                True
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] default_store        sqlite
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] keystone-admin-role  KeystoneAdmin
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] keystone-service-admin-role KeystoneServiceAdmin
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] log_file             /opt/stack/keystone/keystone.log
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] service-header-mappings {
+'nova' : 'X-Server-Management-Url',
+'swift' : 'X-Storage-Url',
+'cdn' : 'X-CDN-Management-Url'}
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] service_host         0.0.0.0
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] service_port         5000
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] verbose              False
+2012-02-08 09:56:43     INFO [keystone-legacy-auth] **************************************************
+2012-02-08 09:56:43     INFO [passlib.registry] registered crypt handler 'sha512_crypt': <class 'passlib.handlers.sha2_crypt.sha512_crypt'>
+2012-02-08 09:56:44    DEBUG [routes.middleware] Initialized with method overriding = True, and path info altering = True
+2012-02-08 09:56:44     INFO [admin] **************************************************
+2012-02-08 09:56:44     INFO [admin] Configuration options gathered from config file:
+2012-02-08 09:56:44     INFO [admin] /opt/stack/keystone/etc/keystone.conf
+2012-02-08 09:56:44     INFO [admin] ================================================
+2012-02-08 09:56:44     INFO [admin] admin_host           0.0.0.0
+2012-02-08 09:56:44     INFO [admin] admin_port           35357
+2012-02-08 09:56:44     INFO [admin] backends             keystone.backends.sqlalchemy
+2012-02-08 09:56:44     INFO [admin] debug                True
+2012-02-08 09:56:44     INFO [admin] default_store        sqlite
+2012-02-08 09:56:44     INFO [admin] keystone-admin-role  KeystoneAdmin
+2012-02-08 09:56:44     INFO [admin] keystone-service-admin-role KeystoneServiceAdmin
+2012-02-08 09:56:44     INFO [admin] log_file             /opt/stack/keystone/keystone.log
+2012-02-08 09:56:44     INFO [admin] service-header-mappings {
+'nova' : 'X-Server-Management-Url',
+'swift' : 'X-Storage-Url',
+'cdn' : 'X-CDN-Management-Url'}
+2012-02-08 09:56:44     INFO [admin] service_host         0.0.0.0
+2012-02-08 09:56:44     INFO [admin] service_port         5000
+2012-02-08 09:56:44     INFO [admin] verbose              False
+2012-02-08 09:56:44     INFO [admin] **************************************************
+2012-02-08 09:56:44    DEBUG [routes.middleware] Initialized with method overriding = True, and path info altering = True
+2012-02-08 09:56:44    DEBUG [eventlet.wsgi.server] (4742) wsgi starting up on http://0.0.0.0:5000/
+2012-02-08 09:56:44    DEBUG [eventlet.wsgi.server] (4742) wsgi starting up on http://0.0.0.0:35357/

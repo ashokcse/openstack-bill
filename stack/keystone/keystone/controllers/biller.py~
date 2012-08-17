@@ -1,0 +1,42 @@
+import logging
+from keystone import utils
+from keystone.common import wsgi
+import keystone.config as config
+from keystone.logic.types.biller import Bill_Unit
+from . import get_marker_limit_and_url
+
+
+LOG = logging.getLogger('keystone.logic.service')
+
+class BillController(wsgi.Controller):
+    """Controller for User related operations"""
+
+    def __init__(self, options):
+        self.options = options
+
+    """@utils.wrap_error
+    def create_user(self, req):
+        u = utils.get_normalized_request_content(User, req)
+        return utils.send_result(201, req, config.SERVICE.create_user(
+            utils.get_auth_token(req), u))
+
+    @utils.wrap_error
+    def get_users(self, req):
+        marker, limit, url = get_marker_limit_and_url(req)
+        users = config.SERVICE.get_users(utils.get_auth_token(req), marker,
+            limit, url)
+        return utils.send_result(200, req, users)"""
+
+    @utils.wrap_error
+    def get_billunit(self, req, biller_id):
+        billunit = config.SERVICE.get_bill_unit(biller_id)
+        LOG.info('keystone controller biller py get_billunit billunit id:%d vcpu:%d ram:%d vdisk:%d %s date enabled:%d'% (billunit.id, billunit.vcpu, billunit.ram, billunit.vdisk, billunit.date, billunit.enabled))
+        return utils.send_result(200, req, billunit)
+        
+    @utils.wrap_error
+    def create_billunit(self, req):
+	LOG.info('Before get_normalization Creating creat_billunit (self, req,) controller.biller.py')
+        u = utils.get_normalized_request_content(Bill_Unit, req)
+	LOG.info('Creating creat_billunit (self, req,) controller.biller.py')
+        return utils.send_result(201, req, config.SERVICE.create_bill_unit(utils.get_auth_token(req), u))
+                

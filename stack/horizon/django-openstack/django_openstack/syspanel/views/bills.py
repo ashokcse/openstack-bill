@@ -1,0 +1,501 @@
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
+
+# Administrator of the National Aeronautics and Space Administration.
+# All Rights Reserved.
+#
+# Copyright 2011 Nebula, Inc.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
+
+from django import template
+from django import http
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render_to_response
+from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
+from django.forms.extras.widgets import SelectDateWidget
+
+import datetime
+import logging
+
+from django.contrib import messages
+
+from django_openstack import api
+from django_openstack import forms
+from django.forms import extras
+from django_openstack.dash.views import instances  as dash_instances
+from django_openstack.decorators import enforce_admin_access
+
+from openstackx.api import exceptions as api_exceptions
+
+
+TerminateInstance = dash_instances.TerminateInstance
+RebootInstance = dash_instances.RebootInstance
+
+LOG = logging.getLogger('django_openstack.syspanel.views.bills.')
+
+
+def _next_month(date_start):
+    y = date_start.year + (date_start.month + 1) / 13
+    m = ((date_start.month + 1) % 13)
+    if m == 0:
+        m = 1
+    return datetime.date(y, m, 1)
+
+
+def _current_month():
+    today = datetime.date.today()
+    return datetime.date(today.year, today.month, 1)
+
+
+def _get_start_and_end_date(request, end_flag=None):
+    try:
+        date_start = datetime.date(
+                int(request.GET['date_year']),
+                int(request.GET['date_month']),
+                1)
+    except:
+        today = datetime.date.today()
+        date_start = datetime.date(today.year, today.month, 1)
+    date_end_flag = 1
+    date_end = _next_month(date_start)
+    datetime_start = datetime.datetime.combine(date_start, datetime.time())
+    datetime_end = datetime.datetime.combine(date_end, datetime.time())
+
+    if date_end > datetime.date.today():
+        datetime_end = datetime.datetime.utcnow()
+        date_end_flag = 0
+    if end_flag == None:
+        return (date_start, date_end, datetime_start, datetime_end)
+    else:
+         return (date_start, date_end, datetime_start, datetime_end, date_end_flag)
+
+
+
+def _csv_usage_link(date_start):
+    return "?date_month=%s&date_year=%s&format=csv" % (date_start.month,
+            date_start.year)
+
+
+@login_required
+@enforce_admin_access
+def usage(request):
+    (date_start, date_end, datetime_start, datetime_end) = \
+            _get_start_and_end_date(request)
+    global_summary = api.GlobalSummary(request)
+    if date_start > _current_month():
+        messages.error(request, 'No data for the selected period')
+        date_end = date_start
+        datetime_end = datetime_start
+    else:
+        global_summary.service()
+        global_summary.usage(datetime_start, datetime_end)
+
+    dateform = forms.DateForm()
+    dateform['date'].field.initial = date_start
+
+    global_summary.avail()
+    global_summary.human_readable('disk_size')
+    global_summary.human_readable('ram_size')
+
+    if request.GET.get('format', 'html') == 'csv':
+        template_name = 'django_openstack/syspanel/bills/usage.csv'
+        mimetype = "text/csv"
+    else:
+        template_name = 'django_openstack/syspanel/bills/usage.html'
+        mimetype = "text/html"
+    LOG.info(' ---$usage$---global summary usage_list-$$$$---- %s -----$-------- ' %(global_summary.usage_list))
+    unit_cost = []
+    (unit_flag, unit_cost) = get_unitCost(request, date_start)
+    global_cost = global_cost_obj(0)
+    cost_total = 0
+    if unit_flag == 1:
+     for usage in global_summary.usage_list: 
+    	for instance in usage.instances:
+		cost_vcpus = float(instance['vcpus'])  * float(unit_cost.vcpu)
+                cost_ram = float(instance['ram_size']) * float(unit_cost.ram)
+                cost_vdisk = float(instance['disk_size']) * float(unit_cost.vdisk)
+                instance['cost'] = float(cost_vcpus + cost_ram + cost_vdisk) * float(instance['hours'])
+		cost_total += instance['cost']
+
+    		LOG.info(' ---$$--instance cost-$$$$---- %s -----$-------- ' %(instance))
+        LOG.info(' ---$$--Updating  tenant usage of tenent ID : %s   =======-$$$$---- -----$-------- ' %(tenant_id))
+        self.tenant_usage(request, tenant_id, 1)
+        LOG.info(' ---$$--Updated tenant usage of tenent ID : %s   =======-$$$$---- -----$-------- ' %(tenant_id))
+
+    else:
+	instance.cost = 'unavailable'
+		
+    LOG.info(' ---$$---global summary usage_list-$$$$---- %s -----$-------- ' %(unit_cost, unit_flag))
+    unit_cost = []
+    return render_to_response(
+    template_name, {
+        'dateform': dateform,
+        'datetime_start': datetime_start,
+        'datetime_end': datetime_end,
+        'usage_list': global_summary.usage_list,
+        'csv_link': _csv_usage_link(date_start),
+        'global_summary': global_summary.summary,
+        'external_links': settings.EXTERNAL_MONITORING,
+    }, context_instance=template.RequestContext(request), mimetype=mimetype)
+
+
+@login_required
+@enforce_admin_access
+def tenant_usage(request, tenant_id, flag=None):
+    (date_start, date_end, datetime_start, datetime_end, month_ended) = \
+            _get_start_and_end_date(request, 1)
+    if date_start > _current_month():
+        messages.error(request, 'No data for the selected period')
+        date_end = date_start
+        datetime_end = datetime_start
+    LOG.info(' ---$ tenant +++ usage $---')
+    dateform = forms.DateForm()
+    dateform['date'].field.initial = date_start
+    usage_tmp = {}
+#
+    global_summary1 = api.GlobalSummary(request)
+    global_summary1.avail()
+    LOG.info(' ---$$--tenant globale-$$$$---- %s -----$-------- ' %(global_summary1.usage_list))
+    unit_cost = []
+    try:
+     (unit_flag, unit_cost) = get_unitCost(request, date_start)
+    except api_exceptions.ApiException, e:
+     messages.error(request, 'No data for the selected period')    
+    """if unit_flag == 0:
+        messages.info(request, 'Bill unavailable, please set the unit cost')
+    (global_summary, global_cost) = calc_cost(request, global_summary1, unit_cost, unit_flag)
+    for usage in global_summary.usage_list :
+	if usage.tenant_id == tenant_id:
+	    usage_tmp = props(usage)
+            LOG.info(' ---$$--tenant usage-$$$$---- %s -----$-------- ' %(usage_temp))
+	    break	
+#    """
+    bill_enabled= True
+    if month_ended == 1:
+        bill_enabled= False
+    usage = {}
+    today = datetime.datetime.today()
+    try:
+     # if(usage_temp == 0):	
+        usage = api.usage_get(request, tenant_id, datetime_start, datetime_end)
+     # else:
+      #   usage = usage_tmp #api.usage_get(request, tenant_id, datetime_start, datetime_end)
+    except api_exceptions.ApiException, e:
+        LOG.exception('ApiException getting usage info for tenant "%s"'
+                  ' on date range "%s to %s"' % (tenant_id,
+                                                 datetime_start,
+                                                 datetime_end))
+        messages.error(request, 'Unable to get usage info: %s' % e.message)
+    total_cost=0
+    total_vcpu=0
+    total_vram=0
+    total_vdisk=0
+    running_instances = []
+    terminated_instances = []
+    if hasattr(usage, 'instances')and unit_flag == 1:
+        now = datetime.datetime.now()
+        for i in usage.instances:
+            # this is just a way to phrase uptime in a way that is compatible
+            # with the 'timesince' filter.  Use of local time intentional
+            LOG.info(' ---$$--instance---- %s --- ' %(i))
+            cost_vcpus = float(i['vcpus'])  * float(unit_cost.vcpu)* float(i['hours'])
+            cost_ram = float(i['ram_size']) * float(unit_cost.ram)* float(i['hours'])
+            cost_vdisk = float(i['disk_size']) * float(unit_cost.vdisk)* float(i['hours'])
+            i['cost'] = float(cost_vcpus + cost_ram + cost_vdisk)
+            total_vcpu+=cost_vcpus 
+            total_vram+=cost_ram
+            total_vdisk+=cost_vdisk            
+            total_cost+=i['cost']
+            try:
+              instanceBill = api.biller_create_ibill(request,
+                                          i['id'],
+                                          i['name'],
+                                          float(cost_vcpus),
+                                          float(cost_ram),
+                                          float(cost_vdisk),
+                                          float(i['cost']),
+                                          today,
+                                          True)
+            except api_exceptions.ApiException, e:
+                    LOG.exception('ApiException while creating Instance billbill Unit\n')
+
+            i['uptime_at'] = now - datetime.timedelta(seconds=i['uptime'])
+            if i['ended_at']:
+                terminated_instances.append(i)
+            else:
+                running_instances.append(i)
+        usage.total_cost=total_cost
+        try:
+         LOG.exception('-----Tenent Creation Started -------')
+         tenantdb = api.biller_create_ubill(request,
+                                          None,
+                                          tenant_id,
+                                          float(total_vcpu),
+                                          float(total_vram),
+                                          float(total_vdisk),
+                                          float(total_cost),
+                                          datetime_start,
+                                          bill_enabled)
+         LOG.exception('-----Tenent Created Sucessfully -------')                                     
+        except api_exceptions.ApiException, e:
+         LOG.exception('-----Tenent Creation Exception')
+
+    if request.GET.get('format', 'html') == 'csv':
+        template_name = 'django_openstack/syspanel/bills/tenant_usage.csv'
+        mimetype = "text/csv"
+    else:
+        template_name = 'django_openstack/syspanel/bills/tenant_usage.html'
+        mimetype = "text/html"
+    if flag!=None:
+      LOG.info('Flag is set')
+      return 1
+
+    return render_to_response(template_name, {
+        'dateform': dateform,
+        'datetime_start': datetime_start,
+        'datetime_end': datetime_end,
+	'unit_cost': unit_cost,
+        'usage': usage,
+        'csv_link': _csv_usage_link(date_start),
+        'instances': running_instances + terminated_instances,
+        'tenant_id': tenant_id,
+    }, context_instance=template.RequestContext(request), mimetype=mimetype)
+
+
+
+@login_required
+@enforce_admin_access
+class global_cost_obj:
+    def __init__(self, request, vcpus):
+        self.vcpus = vcpus
+
+@login_required
+@enforce_admin_access
+def index(request):
+    (date_start, date_end, datetime_start, datetime_end) = \
+            _get_start_and_end_date(request)
+
+    global_summary = api.GlobalSummary(request)
+    if date_start > _current_month():
+        messages.error(request, 'No data for the selected period')
+        date_end = date_start
+        datetime_end = datetime_start
+    else:
+        global_summary.service()
+        global_summary.usage(datetime_start, datetime_end)
+
+    dateform = forms.DateForm()
+    dateform['date'].field.initial = date_start
+    LOG.info('--date field--(date_start: %s, date_end: %s, datetime_start: %s, datetime_end: %s) ' %(date_start, date_end, datetime_start, datetime_end))
+
+    
+    unit_cost = []
+    (unit_flag, unit_cost) = get_unitCost(request, date_start)
+    if unit_flag == 0:
+        messages.info(request, 'Unable to list This month bill, Pleace set unit bill for this month')
+
+    if request.GET.get('format', 'html') == 'csv':
+        template_name = 'django_openstack/syspanel/bills/usage.csv'
+        mimetype = "text/csv"
+    else:
+        template_name = 'django_openstack/syspanel/bills/index.html'
+        mimetype = "text/html"
+    global_summary.avail()
+#    LOG.info(' ------^^^^global summary^^^^^-------- %s ' %(global_summary.summary))
+#    global_cost = global_cost_obj(0)
+    
+    (global_summary, global_cost) = calc_cost(request, global_summary, unit_cost, unit_flag)     
+    global_summary.human_readable('disk_size')
+    global_summary.human_readable('ram_size')
+    LOG.info('-------global summary---%s--+++-- %s ' %(global_summary, unit_cost))
+    return render_to_response(
+    template_name, {
+        'dateform': dateform,
+        'datetime_start': datetime_start,
+        'datetime_end': datetime_end,
+        'usage_list': global_summary.usage_list,
+        'unit_cost' : unit_cost,
+        'csv_link': _csv_usage_link(date_start),
+        'global_cost': global_cost,
+        'global_summary': global_summary.summary,
+        'external_links': settings.EXTERNAL_MONITORING,
+    }, context_instance=template.RequestContext(request), mimetype=mimetype)
+
+
+
+
+class BillForm(forms.Form): 
+    vcpu = forms.DecimalField(label="virtual CPU (1 - $)", max_digits=6, decimal_places=4)
+    ram = forms.DecimalField(label="RAM (1 MB - $)", max_digits=6, decimal_places=4)
+    vdisk = forms.DecimalField(label="virtual Disk (1 GB - $)", max_digits=6, decimal_places=4)
+    this_year = datetime.date.today().year
+    years = range(this_year, this_year+4, 0-1)
+    billdate = forms.DateField(label="DATE", widget=SelectDateWidget(years=years))  
+      
+
+
+@login_required
+@enforce_admin_access
+def get_unitCost(request, date_start):
+    unit_cost = []
+    try:
+        unit_cost = api.biller_get(request, date_start)
+        LOG.info('....unit const.... %s' %unit_cost.__dict__)
+        unit_cost.start_date = date_start
+        unit_cost.end_date = _next_month(date_start)
+        unit_flag = 1
+    except api_exceptions.ApiException, e:
+	unit_flag = 0
+    return (unit_flag, unit_cost)
+
+@login_required
+@enforce_admin_access
+def calc_cost(request, global_summary, unit_cost, unit_flag):
+    today = datetime.datetime.today() 
+    LOG.info(' ------^^^^global summary^^^^^-------- %s ' %(global_summary.summary))
+    global_cost = global_cost_obj(request, '0')
+    if (('total_cpu_usage' in global_summary.summary) and (unit_flag == 1)):
+        global_cost.vcpus = float(global_summary.summary['total_cpu_usage'])  * float(unit_cost.vcpu)
+        global_cost.ram = float(global_summary.summary['total_ram_usage']) * float(unit_cost.ram)
+        global_cost.vdisk = float(global_summary.summary['total_disk_usage']) * float(unit_cost.vdisk)
+        global_cost.total = global_cost.vcpus + global_cost.ram + global_cost.vdisk
+        for usage in global_summary.usage_list:
+         LOG.info(' ---$$--usage details-$$$$---- %s -----$-------- ' %(usage.__dict__))
+         usage.total_cpu_cost = (float(usage.total_cpu_usage) * float(unit_cost.vcpu))
+         usage.total_ram_cost = (float(usage.total_ram_usage) * float(unit_cost.ram))
+         usage.total_disk_cost = (float(usage.total_disk_usage) * float(unit_cost.vdisk))
+         usage.total_cost = usage.total_cpu_cost + usage.total_ram_cost + usage.total_disk_cost
+         for instance in usage.instances:
+                LOG.info(' ---$$--instance---- %s --- ' %(instance))
+                cost_vcpus = float(instance['vcpus'])  * float(unit_cost.vcpu) * float(instance['hours'])
+                cost_ram = float(instance['ram_size']) * float(unit_cost.ram)* float(instance['hours'])
+                cost_vdisk = float(instance['disk_size']) * float(unit_cost.vdisk)* float(instance['hours'])
+                instance['cost'] = float(cost_vcpus + cost_ram + cost_vdisk) 
+                total_icost = instance['cost']
+                LOG.info(' ---$$--instance cost-$$$$---- %s -----$-%s cost_vcpus------- ' %(instance, cost_vcpus))
+                #try:
+                 # instanceB = api.biller_get_ibill(request,  instance['id'])
+                  #if instanceB['changed_on'] < _current_month():
+                   #cost_vcpus+ =instanceB['total_vcpu']
+                   #cost_ram += instanceB['total_ram']
+                   #cost_vdisk +=instanceB['total_vdisk']
+                   #total_icost +=instanceB['total_cost']
+                #except :
+                 #   LOG.exception('New instance bill')
+                try:
+                  instanceBill = api.biller_create_ibill(request,
+                                          instance['id'],
+                                          instance['name'],
+                                          float(cost_vcpus),
+                                          float(cost_ram),
+                                          float(cost_vdisk),
+                                          float(total_icost),
+                                          today,
+                                          True)
+                 # messages.success(request, 'A Instance Bill Unit was successfully created.')
+                  instanceBill1 = api.biller_get_ibill(request,  instance['id'])
+                  LOG.info('instance get --- %s---'%instanceBill1.__dict__)
+                except api_exceptions.ApiException, e:
+                    LOG.exception('ApiException while creating Instance bill Unit\n')
+         LOG.info(' ---$$--Updating  tenant usage of tenent ID : %s   =======-$$$$---- -----$-------- ' %(usage.tenant_id))
+         tenant_usage(request, usage.tenant_id, 1)
+         LOG.info(' ---$$--Updated tenant usage of tenent ID : %s   =======-$$$$---- -----$-------- ' %(usage.tenant_id))
+
+    else:
+        global_cost.vcpus = 0.0
+        global_cost.ram = 0.0
+        global_cost.vdisk = 0.0
+        global_cost.total = 0.0
+
+    return (global_summary, global_cost)
+
+
+@login_required
+@enforce_admin_access
+def create(request):
+   
+    if request.method == "POST":
+        form = BillForm(request.POST)
+       
+        if form.is_valid():
+           billunit = form.clean()
+           true_date = datetime.date(billunit['billdate'].year, billunit['billdate'].month, 1)
+           if true_date < _current_month():
+              messages.error(request, 'Cannot change Unit bill for past months')
+              return redirect('syspanel_bills_create')
+           else:
+            # TODO Make this a real request
+            try:
+                today = datetime.datetime.today()
+
+            	LOG.info('Creating billUnit with date %s corrected to %s | Today : %s' % (billunit['billdate'], true_date, today) )
+                new_billunit = api.biller_create(request,
+                                          float(billunit['vcpu']),
+                                          float(billunit['ram']),
+                                          float(billunit['vdisk']),
+                                          true_date,
+                                          today,
+                                          True)
+                messages.success(request,
+                                 'A Bill Unit was successfully created.')
+               
+                return redirect('syspanel_bills')
+
+            except api_exceptions.ApiException, e:
+                LOG.exception('ApiException while creating bill Unit\n'
+                          'vcpu: "%f", ram: "%f",vdisk: "%f",date : %s' % (billunit['vcpu'], billunit['ram'], billunit['vdisk'], billunit['billdate']))
+                messages.error(request,
+                                 'Error creating bill Unit: %s'
+                                 % e.message)
+                return redirect('syspanel_bills')
+        else:
+            return render_to_response(
+            'django_openstack/syspanel/bills/create.html', {
+                'form': form,                            
+            }, context_instance=template.RequestContext(request))
+
+    else:
+        form = BillForm()
+        return render_to_response(
+        'django_openstack/syspanel/bills/create.html', {
+            'form': form,                    
+        }, context_instance=template.RequestContext(request))
+
+@login_required
+@enforce_admin_access
+def refresh(request):
+    for f in (TerminateInstance, RebootInstance):
+        _, handled = f.maybe_handle(request)
+        if handled:
+            return handled
+
+    instances = []
+    try:
+        instances = api.admin_server_list(request)
+    except Exception as e:
+        messages.error(request, 'Unable to get instance list: %s' % e.message)
+
+    # We don't have any way of showing errors for these, so don't bother
+    # trying to reuse the forms from above
+    terminate_form = TerminateInstance()
+    reboot_form = RebootInstance()
+
+    return render_to_response(
+    'django_openstack/syspanel/bills/_list.html', {
+        'instances': instances,
+        'terminate_form': terminate_form,
+        'reboot_form': reboot_form,
+    }, context_instance=template.RequestContext(request))

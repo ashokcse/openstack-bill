@@ -1,0 +1,12 @@
+Metadata-Version: 1.0
+Name: keystone
+Version: 2011.3.1
+Summary: Authentication service - proposed for OpenStack
+Home-page: http://www.openstack.org
+Author: OpenStack, LLC.
+Author-email: openstack@lists.launchpad.net
+License: Apache License (2.0)
+Description: UNKNOWN
+Keywords: identity auth authentication openstack
+Platform: UNKNOWN
+Classifier: Programming Language :: Python

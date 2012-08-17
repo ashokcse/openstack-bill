@@ -1,0 +1,19 @@
+  <table class="wide">
+      <tr id="headings">
+        <th>VCPU CPU-Hours</th>
+        <th>RAM MB-Hours</th>
+        <th>Disk GB-Hours</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Changed on </th>
+        <th>Action </th>
+      </tr>
+      <tr>
+        <td>$ {{unit_cost.vcpu|floatformat:3}}</td>
+        <td>$ {{unit_cost.ram|floatformat:4}}</td>
+        <td>$ {{unit_cost.vdisk|floatformat:4}}</td>
+        <td> {{unit_cost.start_date}}</td>
+        <td> {{unit_cost.end_date}}</td>
+        <td> {{unit_cost.changed_on}}</td>
+	<td><b><a id="bill_create_link" class="action_link small-rounded" href="{% url syspanel_bills_create %}">Create new unit price </a><b></td>
+      </tr>

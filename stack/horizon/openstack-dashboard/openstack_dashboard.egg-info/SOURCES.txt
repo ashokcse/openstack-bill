@@ -1,0 +1,8 @@
+README
+setup.py
+openstack_dashboard.egg-info/PKG-INFO
+openstack_dashboard.egg-info/SOURCES.txt
+openstack_dashboard.egg-info/dependency_links.txt
+openstack_dashboard.egg-info/not-zip-safe
+openstack_dashboard.egg-info/requires.txt
+openstack_dashboard.egg-info/top_level.txt

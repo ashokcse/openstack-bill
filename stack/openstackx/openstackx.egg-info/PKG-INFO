@@ -1,0 +1,19 @@
+Metadata-Version: 1.0
+Name: openstackx
+Version: 0.2
+Summary: Client library extensions for the OpenStack API
+Home-page: http://github.com/cloudbuilders/openstackx/
+Author: Anthony Young
+Author-email: sleepsonthefloor@gmail.com
+License: Apache 2.0
+Description: *DEPRECATED*
+        
+        This is being deleted in favor of python-novaclient.  We are working on moving all the functionality into nova core and novaclient.
+        
+        See: https://github.com/rackspace/python-novaclient
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: Apache 2.0 License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python

@@ -1,0 +1,21 @@
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] **************************************************
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] Configuration options gathered from config file:
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] /opt/stack/keystone/etc/keystone.conf
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] ================================================
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] admin_host           0.0.0.0
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] admin_port           35357
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] backends             keystone.backends.sqlalchemy
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] debug                True
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] default_store        sqlite
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] keystone-admin-role  KeystoneAdmin
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] keystone-service-admin-role KeystoneServiceAdmin
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] log_file             /opt/stack/keystone/keystone.log
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] service-header-mappings {
+'nova' : 'X-Server-Management-Url',
+'swift' : 'X-Storage-Url',
+'cdn' : 'X-CDN-Management-Url'}
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] service_host         0.0.0.0
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] service_port         5000
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] verbose              False
+2012-01-29 21:15:05     INFO [keystone-legacy-auth] **************************************************
+2012-01-29 21:15:05     INFO [passlib.registry] registered crypt handler 'sha512_crypt': <class 'passlib.handlers.sha2_crypt.sha512_crypt'>

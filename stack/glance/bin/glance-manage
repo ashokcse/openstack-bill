@@ -1,0 +1,144 @@
+#!/usr/bin/env python
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
+
+# Copyright 2010 United States Government as represented by the
+# Administrator of the National Aeronautics and Space Administration.
+# Copyright 2011 OpenStack LLC.
+# All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
+"""
+Glance Management Utility
+"""
+
+# FIXME(sirp): When we have glance-admin we can consider merging this into it
+# Perhaps for consistency with Nova, we would then rename glance-admin ->
+# glance-manage (or the other way around)
+
+import gettext
+import optparse
+import os
+import sys
+
+# If ../glance/__init__.py exists, add ../ to Python search path, so that
+# it will override what happens to be installed in /usr/(local/)lib/python...
+possible_topdir = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
+                                   os.pardir,
+                                   os.pardir))
+if os.path.exists(os.path.join(possible_topdir, 'glance', '__init__.py')):
+    sys.path.insert(0, possible_topdir)
+
+gettext.install('glance', unicode=1)
+
+from glance import version as glance_version
+from glance.common import config
+from glance.common import exception
+import glance.registry.db
+import glance.registry.db.migration
+
+
+def create_options(parser):
+    """
+    Sets up the CLI and config-file options that may be
+    parsed and program commands.
+
+    :param parser: The option parser
+    """
+    config.add_common_options(parser)
+    config.add_log_options(parser)
+    glance.registry.db.add_options(parser)
+
+
+def do_db_version(options, args):
+    """Print database's current migration level"""
+    print glance.registry.db.migration.db_version(options)
+
+
+def do_upgrade(options, args):
+    """Upgrade the database's migration level"""
+    try:
+        db_version = args[1]
+    except IndexError:
+        db_version = None
+
+    glance.registry.db.migration.upgrade(options, version=db_version)
+
+
+def do_downgrade(options, args):
+    """Downgrade the database's migration level"""
+    try:
+        db_version = args[1]
+    except IndexError:
+        raise exception.MissingArgumentError(
+            "downgrade requires a version argument")
+
+    glance.registry.db.migration.downgrade(options, version=db_version)
+
+
+def do_version_control(options, args):
+    """Place a database under migration control"""
+    glance.registry.db.migration.version_control(options)
+
+
+def do_db_sync(options, args):
+    """Place a database under migration control and upgrade"""
+    try:
+        db_version = args[1]
+    except IndexError:
+        db_version = None
+    glance.registry.db.migration.db_sync(options, version=db_version)
+
+
+def dispatch_cmd(options, args):
+    """Search for do_* cmd in this module and then run it"""
+    cmd = args[0]
+    try:
+        cmd_func = globals()['do_%s' % cmd]
+    except KeyError:
+        sys.exit("ERROR: unrecognized command '%s'" % cmd)
+
+    try:
+        cmd_func(options, args)
+    except exception.Error, e:
+        sys.exit("ERROR: %s" % e)
+
+
+def main():
+    version = '%%prog %s' % glance_version.version_string()
+    usage = "%prog [options] <cmd>"
+    oparser = optparse.OptionParser(usage, version=version)
+    create_options(oparser)
+    (options, args) = config.parse_options(oparser)
+
+    try:
+        # We load the glance-registry config section because
+        # sql_connection is only part of the glance registry.
+        conf_file, conf = config.load_paste_config('glance-registry',
+                                                   options, args)
+        config.setup_logging(options, conf)
+    except RuntimeError, e:
+        sys.exit("ERROR: %s" % e)
+
+    if not args:
+        oparser.print_usage()
+        sys.exit(1)
+
+    if conf.get('sql_connection') and not options['sql_connection']:
+        options['sql_connection'] = conf.get('sql_connection')
+
+    dispatch_cmd(options, args)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,50 @@
+SUCCESS: Tenant customer-x created.
+SUCCESS: Tenant ANOTHER:TENANT created.
+SUCCESS: Tenant project-y created.
+SUCCESS: User joeuser created.
+SUCCESS: User joeadmin created.
+SUCCESS: User admin created.
+SUCCESS: User serviceadmin created.
+SUCCESS: User disabled created.
+SUCCESS: Role Admin created successfully.
+SUCCESS: Role KeystoneServiceAdmin created successfully.
+SUCCESS: Granted Admin the admin role on None.
+SUCCESS: Granted KeystoneServiceAdmin the serviceadmin role on None.
+SUCCESS: Granted Admin the joeadmin role on customer-x.
+SUCCESS: Granted Admin the joeadmin role on ANOTHER:TENANT.
+SUCCESS: Role Member created successfully.
+SUCCESS: Granted Member the joeuser role on customer-x.
+SUCCESS: Service exampleservice created successfully.
+SUCCESS: Service swift created successfully.
+SUCCESS: Service cdn created successfully.
+SUCCESS: Service nova created successfully.
+SUCCESS: Service nova_compat created successfully.
+SUCCESS: Service glance created successfully.
+SUCCESS: Service identity created successfully.
+SUCCESS: Created EndpointTemplates for swift pointing to http://swift.publicinternets.com/v1/AUTH_%tenant_id%.
+SUCCESS: Created EndpointTemplates for nova_compat pointing to http://nova.publicinternets.com/v1.0/.
+SUCCESS: Created EndpointTemplates for nova pointing to http://nova.publicinternets.com/v1.1/.
+SUCCESS: Created EndpointTemplates for glance pointing to http://glance.publicinternets.com/v1.1/%tenant_id%.
+SUCCESS: Created EndpointTemplates for cdn pointing to http://cdn.publicinternets.com/v1.1/%tenant_id%.
+SUCCESS: Created EndpointTemplates for swift pointing to http://swift.publicinternets.com/v1/AUTH_%tenant_id%.
+SUCCESS: Created EndpointTemplates for nova pointing to http://nova.publicinternets.com/v1.0/.
+SUCCESS: Created EndpointTemplates for nova_compat pointing to http://nova.publicinternets.com/v1.1/.
+SUCCESS: Created EndpointTemplates for glance pointing to http://glance.publicinternets.com/v1.1/%tenant_id%.
+SUCCESS: Created EndpointTemplates for cdn pointing to http://cdn.publicinternets.com/v1.1/%tenant_id%.
+SUCCESS: Created EndpointTemplates for identity pointing to http://keystone.publicinternets.com/v2.0.
+SUCCESS: Token 887665443383838 created.
+SUCCESS: Token 999888777666 created.
+SUCCESS: Token 111222333444 created.
+SUCCESS: Token 000999 created.
+SUCCESS: Token 999888777 created.
+SUCCESS: Endpoint 1 added to tenant customer-x.
+SUCCESS: Endpoint 2 added to tenant customer-x.
+SUCCESS: Endpoint 3 added to tenant customer-x.
+SUCCESS: Endpoint 4 added to tenant customer-x.
+SUCCESS: Endpoint 5 added to tenant customer-x.
+SUCCESS: Credentials admin created.
+Starting the RAX-KEY extension
+Starting the Legacy Authentication component
+Starting test 1 of 2 with config: sql.conf.template
+Starting the keystone server...
+Stopping the keystone server...

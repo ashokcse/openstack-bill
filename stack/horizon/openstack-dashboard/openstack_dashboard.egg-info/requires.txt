@@ -1,0 +1,2 @@
+setuptools
+mox>=0.5.0
