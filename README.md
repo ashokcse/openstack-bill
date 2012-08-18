@@ -39,6 +39,7 @@ Step 2: Download these files or git clone
        
 Step 3: Running initial setup
 
+        cd openstack-bill
         sudo python initial_setup.py
         
 Step 4: Go to devstach directory (~/devstack)
