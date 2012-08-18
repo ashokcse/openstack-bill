@@ -33,10 +33,10 @@ $BIN_DIR/keystone-manage $* service add keystone identity "Keystone Identity Ser
 $BIN_DIR/keystone-manage $* service add swift object-store "Swift Service"
 
 #endpointTemplates
-$BIN_DIR/keystone-manage $* endpointTemplates add RegionOne nova http://192.168.179.228:8774/v1.1/%tenant_id% http://192.168.179.228:8774/v1.1/%tenant_id%  http://192.168.179.228:8774/v1.1/%tenant_id% 1 1
-$BIN_DIR/keystone-manage $* endpointTemplates add RegionOne glance http://192.168.179.228:9292/v1.1/%tenant_id% http://192.168.179.228:9292/v1.1/%tenant_id% http://192.168.179.228:9292/v1.1/%tenant_id% 1 1
-$BIN_DIR/keystone-manage $* endpointTemplates add RegionOne keystone http://192.168.179.228:5000/v2.0 http://192.168.179.228:35357/v2.0 http://192.168.179.228:5000/v2.0 1 1
-$BIN_DIR/keystone-manage $* endpointTemplates add RegionOne swift http://192.168.179.228:8080/v1/AUTH_%tenant_id% http://192.168.179.228:8080/ http://192.168.179.228:8080/v1/AUTH_%tenant_id% 1 1
+$BIN_DIR/keystone-manage $* endpointTemplates add RegionOne nova http://192.168.179.188:8774/v1.1/%tenant_id% http://192.168.179.188:8774/v1.1/%tenant_id%  http://192.168.179.188:8774/v1.1/%tenant_id% 1 1
+$BIN_DIR/keystone-manage $* endpointTemplates add RegionOne glance http://192.168.179.188:9292/v1.1/%tenant_id% http://192.168.179.188:9292/v1.1/%tenant_id% http://192.168.179.188:9292/v1.1/%tenant_id% 1 1
+$BIN_DIR/keystone-manage $* endpointTemplates add RegionOne keystone http://192.168.179.188:5000/v2.0 http://192.168.179.188:35357/v2.0 http://192.168.179.188:5000/v2.0 1 1
+$BIN_DIR/keystone-manage $* endpointTemplates add RegionOne swift http://192.168.179.188:8080/v1/AUTH_%tenant_id% http://192.168.179.188:8080/ http://192.168.179.188:8080/v1/AUTH_%tenant_id% 1 1
 
 # Tokens
 $BIN_DIR/keystone-manage $* token add asd admin admin 2015-02-05T00:00
