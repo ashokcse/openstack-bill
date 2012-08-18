@@ -5,5 +5,5 @@ django-registration==0.7
 python-cloudfiles
 sqlalchemy-migrate
 
-
+-e git+https://github.com/jacobian/openstack.compute.git#egg=openstack
 
