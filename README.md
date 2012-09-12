@@ -38,7 +38,8 @@ Step 2: Download these files or git clone
        git clone git://github.com/ashokcse/openstack-bill.git
        
 Step 3: Running initial setup
-
+        
+        cd openstack-bill
         sudo python initial_setup.py
         
 Step 4: Go to devstach directory (~/devstack)
